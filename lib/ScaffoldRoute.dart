@@ -1,36 +1,12 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ScaffoldRoute(),
-    );
-  }
-}
-
 class ScaffoldRoute extends StatefulWidget {
   @override
   _ScaffoldRouteState createState() => _ScaffoldRouteState();
 }
 
-class _ScaffoldRouteState extends State<ScaffoldRoute>
-    with SingleTickerProviderStateMixin {
-  TabController _tabController; // 定义一个 TabController
-  List tabs = ["新闻", "历史", "图片"];
-
+class _ScaffoldRouteState extends State<ScaffoldRoute> {
   int _selectedIndex = 1;
-
-  @override
-  void initState() {
-    super.initState();
-    // 创建 Controller
-    _tabController = TabController(length: tabs.length, vsync: this);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,36 +27,19 @@ class _ScaffoldRouteState extends State<ScaffoldRoute>
             },
           );
         }),
-        bottom: TabBar(
-            //生成Tab菜单r
-            controller:
-                _tabController, // 这个 Controller 与 TabBarView 的 Controller 是同一个
-            tabs: tabs.map((e) => Tab(text: e)).toList()),
       ),
       drawer: MyDrawer(), //抽屉
-      body: TabBarView(
-        controller: _tabController,
-        children: tabs.map((e) {
-          //创建3个Tab页
-          return Container(
-            alignment: Alignment.center,
-            child: Text(e, textScaleFactor: 5),
-          );
-        }).toList(),
+      bottomNavigationBar: BottomNavigationBar(
+        // 底部导航
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: '首页'),
+          BottomNavigationBarItem(icon: Icon(Icons.business), label: '商城'),
+          BottomNavigationBarItem(icon: Icon(Icons.school), label: '学校'),
+        ],
+        currentIndex: _selectedIndex,
+        fixedColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        shape: CircularNotchedRectangle(), // 底部导航栏打一个圆形的洞
-        child: Row(
-          children: [
-            IconButton(icon: Icon(Icons.home)),
-            SizedBox(), //中间位置空出
-            IconButton(icon: Icon(Icons.business)),
-          ],
-          mainAxisAlignment: MainAxisAlignment.spaceAround, //均分底部导航栏横向空间
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
           //悬浮按钮
           child: Icon(Icons.add),
