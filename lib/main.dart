@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aione_music/PageViewS.dart';
 
 void main() {
   runApp(MyApp());
@@ -8,147 +9,126 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: ScaffoldRoute(),
+      home: HomePage(),
     );
   }
 }
 
-class ScaffoldRoute extends StatefulWidget {
-  @override
-  _ScaffoldRouteState createState() => _ScaffoldRouteState();
-}
-
-class _ScaffoldRouteState extends State<ScaffoldRoute>
-    with SingleTickerProviderStateMixin {
-  TabController _tabController; // 定义一个 TabController
-  List tabs = ["新闻", "历史", "图片"];
-
-  int _selectedIndex = 1;
-
-  @override
-  void initState() {
-    super.initState();
-    // 创建 Controller
-    _tabController = TabController(length: tabs.length, vsync: this);
-  }
-
+// 主页
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        //导航栏
-        title: Text("App Name"),
-        actions: <Widget>[
-          //导航栏右侧菜单
-          IconButton(icon: Icon(Icons.share), onPressed: () {}),
-        ],
-        leading: Builder(builder: (context) {
-          return IconButton(
-            icon: Icon(Icons.dashboard, color: Colors.white), //自定义图标
-            onPressed: () {
-              // 打开抽屉菜单
-              Scaffold.of(context).openDrawer();
-            },
-          );
-        }),
-        bottom: TabBar(
-            //生成Tab菜单r
-            controller:
-                _tabController, // 这个 Controller 与 TabBarView 的 Controller 是同一个
-            tabs: tabs.map((e) => Tab(text: e)).toList()),
+      appBar: AppBar(toolbarHeight: 0),
+      body: Column(
+        children: <Widget>[HomeTabs(),Container(
+            child: PageView(
+              children: [
+                _HomeContent(),
+                _HomeContent()
+              ],
+            ))],
       ),
-      drawer: MyDrawer(), //抽屉
-      body: TabBarView(
-        controller: _tabController,
-        children: tabs.map((e) {
-          //创建3个Tab页
-          return Container(
-            alignment: Alignment.center,
-            child: Text(e, textScaleFactor: 5),
-          );
-        }).toList(),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        shape: CircularNotchedRectangle(), // 底部导航栏打一个圆形的洞
-        child: Row(
-          children: [
-            IconButton(icon: Icon(Icons.home)),
-            SizedBox(), //中间位置空出
-            IconButton(icon: Icon(Icons.business)),
-          ],
-          mainAxisAlignment: MainAxisAlignment.spaceAround, //均分底部导航栏横向空间
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-          //悬浮按钮
-          child: Icon(Icons.add),
-          onPressed: _onAdd),
     );
   }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  void _onAdd() {}
 }
 
-class MyDrawer extends StatelessWidget {
-  const MyDrawer({
+class HomeTabs extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 200,
+        child: Row(
+          children: <Widget>[
+            _Tabs(title: '兆赫'),
+            _Tabs(title: '发现'),
+            _Tabs(title: '我的'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ignore: unused_element
+class _Tabs extends StatelessWidget {
+  const _Tabs({
     Key key,
+    this.title,
   }) : super(key: key);
+
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: MediaQuery.removePadding(
-        context: context,
-        //移除抽屉菜单顶部默认留白
-        removeTop: true,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 38.0),
-              child: Row(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: ClipOval(
-                      child: Image.asset(
-                        "imgs/avatar.png",
-                        width: 80,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    "Wendux",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                children: <Widget>[
-                  ListTile(
-                    leading: const Icon(Icons.add),
-                    title: const Text('Add account'),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.settings),
-                    title: const Text('Manage accounts'),
-                  ),
-                ],
-              ),
-            ),
-          ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return ViewPage();
+        }));
+      },
+      child: Container(
+        width: 66.0,
+        height: 29.0,
+        decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.all(Radius.circular(50)),
+            color: Colors.red),
+        child: Text(
+          '$title',
+          textAlign: TextAlign.center,
+          style:
+          TextStyle(fontSize: 16, color: Color.fromRGBO(236, 240, 241, 1.0)),
         ),
       ),
+    );
+  }
+}
+
+class HomePageViews extends StatefulWidget {
+  @override
+  _HomePageViews createState() => _HomePageViews();
+}
+
+class _HomePageViews extends State<HomePageViews> {
+  PageController controller;
+  @override
+  void initState() {
+    super.initState();
+    controller = PageController(initialPage: 1);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  List<Widget> pageList = [_HomeContent(), _HomeContent(), _HomeContent(), _HomeContent()];
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        body: SafeArea(
+            child: PageView(
+              controller: controller,
+              children: pageList,
+            )
+        )
+    );
+  }
+}
+
+class _HomeContent extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 50,
+      decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.all(Radius.circular(50)),
+          color: Colors.red),
+      child: Text('额呵呵'),
     );
   }
 }
